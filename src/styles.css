@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #1f2024;
+  --ink-soft: #5d5d66;
+  --muted: #8f8a83;
+  --faint: #b3ada4;
+  --paper: #f7f3ec;
+  --sheet: #fffdf9;
+  --line: rgba(31, 32, 36, 0.08);
+  --line-strong: rgba(31, 32, 36, 0.13);
+  --hover: rgba(31, 32, 36, 0.05);
+  --accent: #e0604e;
+  --accent-soft: rgba(240, 109, 90, 0.12);
+  --ok: #6f8f66;
+  font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+/* Both windows are transparent; only drawn shapes are visible. */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+  user-select: none;
+}
+
+button, input, textarea { font: inherit; color: inherit; }
+button { border: 0; background: none; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------------------------------------------------------------- Pet */
+
+/*
+ * Layers (outer → inner): .pet (button, no hit area) → .pet-shadow (stays on the ground)
+ * → .pet-lift (hover) → .pet-figure (state motion) → art + .pet-hit (the only clickable shape).
+ * Whole-body motion animates transform on HTML elements so it stays on the compositor.
+ */
+.pet {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pet:focus-visible { outline: none; }
+.pet-lift, .pet-figure { position: absolute; inset: 0; display: block; }
+.pet-figure { transform-origin: 50% 92%; }
+.pet-svg, .pet-img { display: block; overflow: visible; pointer-events: none; }
+/* A faint light rim keeps the dark hoodie and headphones legible on dark desktops. */
+.pet .pet-svg, .pet .pet-img {
+  filter: drop-shadow(0 0 0.5px rgba(255, 253, 249, 0.85)) drop-shadow(0 0 1.5px rgba(255, 253, 249, 0.35));
+}
+.pet-art, .pet-canvas, .pet-overlay { position: absolute !important; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+/* Art scales with the window, so the pet works at 92 or 128 CSS px. */
+.pet-art .pet-svg, .pet-img { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* A light and a dark contour together keep the silhouette readable on any desktop colour. */
+.pet-canvas canvas { display: block; filter: drop-shadow(0 0 0.6px rgba(255, 253, 249, 0.6)) drop-shadow(0 0.4px 0.9px rgba(20, 20, 24, 0.3)); }
+.pet-hit { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.pet-hit ellipse { fill: transparent; pointer-events: all; cursor: pointer; }
+
+.pet-shadow {
+  position: absolute;
+  left: 30%;
+  width: 40%;
+  bottom: 3%;
+  height: 6%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(23, 23, 27, 0.22), rgba(23, 23, 27, 0));
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.pet-lift { transition: transform 220ms cubic-bezier(0.3, 1.4, 0.5, 1); }
+.pet:has(.pet-hit ellipse:hover) .pet-lift { transform: translateY(-2px); }
+.pet:has(.pet-hit ellipse:hover) .pet-shadow { transform: scaleX(0.9); opacity: 0.8; }
+/* Walking: the 3D rig animates itself; the SVG fallback gets a light waddle. */
+.pet-walking .pet-figure:has(> .pet-art[data-renderer='svg']) { animation: pet-waddle 0.5s ease-in-out infinite; }
+.pet-running .pet-figure:has(> .pet-art[data-renderer='svg']) { animation: pet-waddle 0.28s ease-in-out infinite; }
+@keyframes pet-waddle {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-1.5px) rotate(3deg); }
+}
+/* :active can stay set for the whole native drag, so the press squash is skipped while walking. */
+.pet:not(.pet-walking):active .pet-lift { transform: scale(1.03, 0.96); transform-origin: 50% 92%; transition-duration: 90ms; }
+
+/* SVG parts */
+.cat-line { fill: none; stroke: #17171b; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.cat-line.thin { stroke-width: 1.4; }
+.cat-head { transform-box: view-box; transform-origin: 46px 60px; transition: transform 420ms cubic-bezier(0.3, 1.3, 0.5, 1); }
+.cat-gaze { transform-box: view-box; transition: transform 260ms ease; }
+.cat-lids { transform-box: fill-box; transform-origin: center; transition: transform 70ms ease-in; }
+.cat-lids.is-blinking { transform: scaleY(0.1); }
+.cat-paw { transform-box: fill-box; transform-origin: center; }
+.cat-tail { transform-box: view-box; transform-origin: 62px 79px; }
+
+/* Idle: gentle float + breathing (one 5s loop). */
+/* One breath per .pet-breathing pulse (scheduled by usePetAnimation), then stillness. */
+.pet-idle.pet-breathing .pet-figure, .pet-thinking.pet-breathing .pet-figure { animation: pet-float 4.2s ease-in-out 1; }
+.pet-idle.pet-breathing .cat-tail { animation: pet-tail 4.2s ease-in-out 1; }
+
+/* Coding: eyes down at the "screen", a slight focused nod, paws tapping. */
+.pet-coding .pet-figure { animation: pet-breathe 4s ease-in-out infinite; }
+.pet-coding .cat-gaze { transform: translateY(1.1px) scaleY(0.85); transform-origin: 46px 46px; }
+.pet-coding .cat-head { animation: pet-nod 2.4s ease-in-out infinite; }
+.pet-coding .cat-paw-left { animation: pet-tap 0.5s ease-in-out infinite; }
+.pet-coding .cat-paw-right { animation: pet-tap 0.5s ease-in-out 0.25s infinite; }
+
+/* Thinking: head tilt, eyes up and to the side. */
+.pet-thinking .cat-head { transform: rotate(-7deg); }
+.pet-thinking .cat-gaze { transform: translate(1.1px, -1.6px); }
+
+/* Happy: one short bounce with squash. */
+.pet-happy .pet-figure { animation: pet-hop 600ms cubic-bezier(0.3, 0.7, 0.4, 1) 1; }
+.pet-happy .pet-shadow { animation: pet-shadow-hop 600ms ease-out 1; }
+
+/* Sleeping: slow, deeper breathing; drifting z's. */
+.pet-sleeping.pet-breathing .pet-figure { animation: pet-sleep 5.5s ease-in-out 1; }
+.pet-sleeping .cat-head { transform: rotate(4deg) translateY(1px); }
+.pet-sleeping.pet-breathing .cat-zz text { animation: pet-zz 2.75s ease-in-out 2; }
+.pet-sleeping.pet-breathing .cat-zz text + text { animation-delay: 0.6s; animation-iteration-count: 1; }
+
+/* Notification: a quick attention hop and wiggle, wide eyes, badge pop. */
+.pet-notification .pet-figure { animation: pet-alert 700ms ease-out 1; }
+.pet-notification .cat-gaze { transform: scale(1.12); transform-origin: 46px 44.6px; }
+.cat-badge { transform-box: fill-box; transform-origin: center; animation: pet-badge 360ms cubic-bezier(0.3, 1.6, 0.5, 1) 1; }
+
+/* Dev-only gallery (/?view=pet-gallery) */
+html[data-view='gallery'], html[data-view='gallery'] body, html[data-view='gallery'] #root { overflow: auto; background: #eceae6; }
+.pet-gallery { display: flex; flex-wrap: wrap; gap: 14px; padding: 14px; min-height: 100%; }
+.pet-gallery figure { margin: 0; text-align: center; font-size: 11px; color: #8f8a83; }
+.pet-gallery .pet { width: var(--tile, 92px); height: var(--tile, 92px); outline: 1px dashed rgba(143, 138, 131, 0.35); }
+
+/* The pet window was hidden from the tray: freeze everything. */
+.pet[data-paused] *, .pet[data-paused] { animation-play-state: paused !important; }
+
+@keyframes pet-float {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-1.6px) scale(1.012, 0.99); }
+}
+@keyframes pet-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.01, 0.992); }
+}
+@keyframes pet-sleep {
+  0%, 100% { transform: scale(1, 1); }
+  45% { transform: scale(1.025, 0.975); }
+}
+@keyframes pet-tail {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-6deg); }
+}
+@keyframes pet-nod {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(1.4deg) translateY(0.4px); }
+}
+@keyframes pet-tap {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.2px); }
+}
+@keyframes pet-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  18% { transform: translateY(0) scale(1.06, 0.93); }
+  48% { transform: translateY(-6px) scale(0.97, 1.04); }
+  78% { transform: translateY(0) scale(1.04, 0.96); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes pet-shadow-hop {
+  48% { transform: scaleX(0.75); opacity: 0.55; }
+}
+@keyframes pet-alert {
+  0% { transform: translateY(0) rotate(0); }
+  25% { transform: translateY(-4px) rotate(-4deg); }
+  50% { transform: translateY(-2px) rotate(4deg); }
+  75% { transform: translateY(0) rotate(-2deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+@keyframes pet-badge {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+@keyframes pet-zz {
+  0% { opacity: 0; transform: translate(0, 2px); }
+  30%, 70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(2px, -3px); }
+}
+
+/* Notes workspace styles live in src/workspace/workspace.css. */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

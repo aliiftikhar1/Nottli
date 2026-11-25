@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Nottli",
+  "version": "0.1.0",
+  "identifier": "com.nottli.app",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "pet",
+        "title": "Nottli",
+        "url": "index.html",
+        "width": 120,
+        "height": 120,
+        "minWidth": 120,
+        "minHeight": 120,
+        "maxWidth": 120,
+        "maxHeight": 120,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "focus": false,
+        "visible": false
+      },
+      {
+        "label": "notes",
+        "title": "Nottli Notes",
+        "url": "index.html",
+        "width": 420,
+        "height": 600,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "licenseFile": "installer/terms.txt",
+    "publisher": "Ali Iftikhar",
+    "copyright": "Copyright (c) 2026 Ali Iftikhar. All rights reserved.",
+    "shortDescription": "Animated desktop companion for quick notes.",
+    "longDescription": "Nottli is an animated desktop companion that makes capturing a thought feel immediate. Quick notes, sticky notes, a command palette and optional clipboard history, all stored locally on your PC.",
+    "windows": {
+      "nsis": {
+        "headerImage": "icons/installer-header.bmp",
+        "sidebarImage": "icons/installer-sidebar.bmp",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "startMenuFolder": "Nottli",
+        "displayLanguageSelector": false,
+        "compression": "lzma"
+      }
+    }
+  }
+}

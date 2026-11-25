@@ -1,0 +1,43 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "pet",
+        "title": "Nottli",
+        "url": "index.html",
+        "width": 128,
+        "height": 128,
+        "minWidth": 128,
+        "minHeight": 128,
+        "maxWidth": 128,
+        "maxHeight": 128,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "focus": false,
+        "visible": false
+      },
+      {
+        "label": "notes",
+        "title": "Nottli Notes",
+        "url": "index.html",
+        "width": 420,
+        "height": 600,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+NOTTLI END USER LICENSE AGREEMENT AND TERMS OF USE
+Last updated: 25 November 2026
+
+Please read these terms carefully. By clicking "I Agree" and installing, or by using Nottli, you agree to them. If you do not agree, click "Cancel" and do not install or use Nottli.
+
+1. LICENSE
+Ali Iftikhar ("we", "us") grants you a personal, non-exclusive, non-transferable, revocable license to install and use Nottli on devices you own or control, for your own personal or internal business use. You may not copy, modify, reverse engineer, decompile, rent, lease, sell, sublicense or redistribute Nottli, except where applicable law gives you that right despite this restriction.
+
+2. YOUR DATA STAYS ON YOUR DEVICE
+Nottli is local-first. Your notes, sticky notes, settings and clipboard history are stored on your computer only (in your Windows user profile). Nottli does not upload this data to us or to any third party, and does not include advertising or analytics. We cannot access or recover your data. You are responsible for backing up anything important to you.
+
+3. CLIPBOARD HISTORY
+Clipboard history is OFF by default. It runs only after you turn it on and accept the in-app notice. When on, Nottli stores what you copy (text, images, rich text and file paths) locally so you can find it again. Nottli tries to skip content that looks like a password or secret, but this detection is best-effort and can miss things. Do not rely on it to protect sensitive information. You can pause, turn off, delete items, set retention, or clear all history at any time.
+
+4. UNINSTALLING AND YOUR LOCAL DATA
+You can uninstall Nottli at any time from Windows Settings > Apps. Your notes and history may remain in your user profile folders so you can reinstall without losing them. You may delete those folders yourself if you want them removed.
+
+5. STARTUP
+If you enable the "start with Windows" option, Nottli adds itself to your user startup entries. You can turn this off in Nottli's settings or in Windows Settings > Apps > Startup.
+
+6. ACCEPTABLE USE
+You agree not to use Nottli to break the law, to infringe the rights of others, or to capture or store information you have no right to copy.
+
+7. UPDATES
+We may release updates that fix bugs or change features. We may change or discontinue features at any time.
+
+8. NO WARRANTY
+Nottli is provided "AS IS" and "AS AVAILABLE", without warranties of any kind, express or implied, including merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that Nottli will be uninterrupted or error-free, or that data will never be lost. Some jurisdictions do not allow certain disclaimers, so parts of this section may not apply to you.
+
+9. LIMITATION OF LIABILITY
+To the maximum extent permitted by law, we are not liable for any indirect, incidental, special, consequential or punitive damages, or for loss of data, profits or goodwill, arising from your use of Nottli. Our total liability for any claim relating to Nottli is limited to the amount you paid for it, or USD 10 if you paid nothing. Nothing in these terms limits liability that cannot be limited by law.
+
+10. TERMINATION
+This license ends automatically if you breach these terms. You may end it at any time by uninstalling Nottli. Sections 8 and 9 survive termination.
+
+11. THIRD-PARTY SOFTWARE
+Nottli includes open source components that are licensed under their own terms. Those terms apply to those components.
+
+12. CHANGES TO THESE TERMS
+We may update these terms. The version shown in the installer of the version you install applies to that version. Continued use after an update means you accept the updated terms.
+
+13. GOVERNING LAW
+These terms are governed by the laws of Pakistan, without regard to conflict of law rules. Mandatory consumer protection rights in your country of residence are not affected.
+
+14. CONTACT
+Questions about these terms: alijaan.coder@gmail.com
