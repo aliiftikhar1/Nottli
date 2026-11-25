@@ -1,18 +1,16 @@
-import { Suspense, lazy, useState } from 'react';
 import { PetCharacter } from '../pet/PetCharacter';
 
-const Pet3DCanvas = lazy(() => import('../pet/3d/Pet3DCanvas'));
-
-/** The header mark: the real three.js cat, head-framed. Falls back to the flat face if WebGL fails. */
+/**
+ * The header mark: the flat SVG cat face.
+ *
+ * This used to mount a second three.js canvas (a whole extra WebGL context plus
+ * the 3D bundle in the hidden notes window) for a 32px icon. That cost tens of
+ * MB of GPU/renderer memory for no visible benefit, so the mark is plain SVG.
+ */
 export function PanelMark({ size = 30 }: { size?: number }) {
-  const [failed, setFailed] = useState(false);
-  const fallback = <PetCharacter faceOnly size={size - 6} />;
-  if (failed) return fallback;
   return (
     <span className="panel-mark-3d" style={{ width: size, height: size }}>
-      <Suspense fallback={fallback}>
-        <Pet3DCanvas state="idle" blinking={false} reducedMotion framing="head" onFailure={() => setFailed(true)} />
-      </Suspense>
+      <PetCharacter faceOnly size={size - 6} />
     </span>
   );
 }

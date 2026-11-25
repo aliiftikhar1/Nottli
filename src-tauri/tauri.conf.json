@@ -63,6 +63,7 @@
     "shortDescription": "Animated desktop companion for quick notes.",
     "longDescription": "Nottli is an animated desktop companion that makes capturing a thought feel immediate. Quick notes, sticky notes, a command palette and optional clipboard history, all stored locally on your PC.",
     "windows": {
+      "webviewInstallMode": { "type": "offlineInstaller" },
       "nsis": {
         "headerImage": "icons/installer-header.bmp",
         "sidebarImage": "icons/installer-sidebar.bmp",

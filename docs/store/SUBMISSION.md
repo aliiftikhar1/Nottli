@@ -1,5 +1,7 @@
 # Microsoft Store submission checklist (Nottli)
 
+> **Current route: MSIX (free, no certificate).** See [TODO.md](TODO.md) and `scripts/build-msix.ps1`. The rest of this file describes the alternative EXE/MSI route, which needs a paid code-signing certificate and is not being used.
+
 Route: **EXE/MSI app** (the NSIS installer as-is). Microsoft hosts the listing; you host the installer file.
 
 ## 0. Legal text

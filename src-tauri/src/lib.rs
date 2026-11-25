@@ -27,7 +27,9 @@ const SCREEN_MARGIN: f64 = 16.0;
 const NOTES_GAP: f64 = 2.0;
 const TOGGLE_SHORTCUT: &str = "CommandOrControl+Alt+N";
 const WINDOW_STATE_FILE: &str = "window-state.json";
-const STARTUP_VALUE_NAME: &str = "DesktopDoodleCompanion";
+const STARTUP_VALUE_NAME: &str = "Nottli";
+#[cfg(windows)]
+const LEGACY_STARTUP_VALUE_NAME: &str = "DesktopDoodleCompanion";
 pub const DATABASE_URL: &str = "sqlite:doodle.db";
 
 const EVENT_NOTES_VISIBILITY: &str = "doodle://notes-visibility";
@@ -334,22 +336,66 @@ fn quit_app(app: AppHandle) {
 // Windows startup registration (preserved from the original app, now in the tray)
 // ---------------------------------------------------------------------------
 
+/// True when running inside an MSIX package (Microsoft Store build).
+#[cfg(windows)]
+fn is_packaged() -> bool {
+    use windows_sys::Win32::Storage::Packaging::Appx::GetCurrentPackageFullName;
+    let mut len: u32 = 0;
+    // APPMODEL_ERROR_NO_PACKAGE (15700) means a plain desktop install; any other
+    // result (e.g. ERROR_INSUFFICIENT_BUFFER) means a package identity exists.
+    unsafe { GetCurrentPackageFullName(&mut len, std::ptr::null_mut()) != 15700 }
+}
+
+/// MSIX builds cannot use the HKCU Run key (registry writes are virtualized),
+/// so they use the StartupTask declared in the package manifest instead.
+#[cfg(windows)]
+fn set_packaged_startup(enabled: bool) -> Result<(), String> {
+    use windows::{
+        core::HSTRING,
+        ApplicationModel::{StartupTask, StartupTaskState},
+    };
+    std::thread::spawn(move || -> Result<(), String> {
+        let task = StartupTask::GetAsync(&HSTRING::from("NottliStartup"))
+            .and_then(|op| op.get())
+            .map_err(|e| e.to_string())?;
+        if enabled {
+            let state = task
+                .RequestEnableAsync()
+                .and_then(|op| op.get())
+                .map_err(|e| e.to_string())?;
+            if state != StartupTaskState::Enabled && state != StartupTaskState::EnabledByPolicy {
+                return Err("Startup was not enabled (blocked by the user or policy)".into());
+            }
+        } else {
+            task.Disable().map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    })
+    .join()
+    .map_err(|_| "startup task thread panicked".to_string())?
+}
+
 fn set_startup_enabled<R: Runtime>(app: &AppHandle<R>, enabled: bool) -> Result<(), String> {
     #[cfg(windows)]
     {
-        use winreg::{enums::HKEY_CURRENT_USER, RegKey};
-        let run_key = RegKey::predef(HKEY_CURRENT_USER)
-            .open_subkey_with_flags(
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                winreg::enums::KEY_WRITE,
-            )
-            .map_err(|e| e.to_string())?;
-        if enabled {
-            let executable = std::env::current_exe().map_err(|e| e.to_string())?;
-            let command = format!("\"{}\" --autostart", executable.display());
-            run_key.set_value(STARTUP_VALUE_NAME, &command).map_err(|e| e.to_string())?;
+        if is_packaged() {
+            set_packaged_startup(enabled)?;
         } else {
-            let _ = run_key.delete_value(STARTUP_VALUE_NAME);
+            use winreg::{enums::HKEY_CURRENT_USER, RegKey};
+            let run_key = RegKey::predef(HKEY_CURRENT_USER)
+                .open_subkey_with_flags(
+                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    winreg::enums::KEY_WRITE,
+                )
+                .map_err(|e| e.to_string())?;
+            let _ = run_key.delete_value(LEGACY_STARTUP_VALUE_NAME);
+            if enabled {
+                let executable = std::env::current_exe().map_err(|e| e.to_string())?;
+                let command = format!("\"{}\" --autostart", executable.display());
+                run_key.set_value(STARTUP_VALUE_NAME, &command).map_err(|e| e.to_string())?;
+            } else {
+                let _ = run_key.delete_value(STARTUP_VALUE_NAME);
+            }
         }
     }
     let mut state = read_window_state(app);

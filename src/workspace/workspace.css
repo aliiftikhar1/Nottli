@@ -194,8 +194,7 @@
   background: linear-gradient(180deg, var(--scrim) 0%, var(--scrim) 55%, var(--scrim-0) 100%);
 }
 .panel-header > .panel-mark { pointer-events: none; display: grid; place-items: center; overflow: visible; }
-.panel-mark-3d { display: block; position: relative; flex: none; overflow: visible; }
-.panel-mark-3d canvas { width: 100% !important; height: 100% !important; }
+.panel-mark-3d { display: grid; place-items: center; position: relative; flex: none; overflow: visible; }
 
 .tabs {
   flex: 1;
@@ -287,6 +286,8 @@
   font-weight: 550;
   color: var(--text);
   border-radius: 999px;
+  white-space: nowrap;
+  flex: none;
 }
 
 .link-button { color: var(--accent); font-weight: 600; font-size: inherit; }
@@ -367,9 +368,20 @@
   min-height: 52px;
   padding: 0 2px 6px 4px;
 }
-.footer-actions { display: flex; align-items: center; gap: 4px; }
+.footer-actions { display: flex; align-items: center; gap: 4px; flex: none; }
 
-.save-state { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-3); padding-left: 6px; }
+.save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: var(--text-3);
+  padding-left: 6px;
+}
 .save-state.is-saved { color: var(--ok); }
 .save-state.is-error { color: var(--accent); }
 .save-state.is-error .link-button { margin-left: 4px; }
