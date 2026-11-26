@@ -1,6 +1,6 @@
 [package]
 name = "desktop-doodle-companion"
-version = "0.1.0"
+version = "1.0.1"
 description = "A lightweight Windows desktop productivity companion"
 authors = ["Nottli"]
 edition = "2021"
