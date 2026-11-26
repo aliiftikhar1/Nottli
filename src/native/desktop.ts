@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { emit, emitTo, listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { LogicalSize } from '@tauri-apps/api/dpi';
 
 export type WindowView = 'pet' | 'notes' | 'sticky';
 
@@ -80,6 +81,16 @@ export async function stickyClose(id: string) {
 }
 export async function stickySetOnTop(id: string, onTop: boolean) {
   if (isTauriRuntime()) await invoke('sticky_set_on_top', { id, onTop });
+}
+/** Grow (never shrink) the sticky window by `extra` logical pixels of height. */
+export async function growStickyBy(extra: number) {
+  if (!isTauriRuntime() || extra <= 0) return;
+  const win = getCurrentWindow();
+  const scale = await win.scaleFactor();
+  const size = (await win.innerSize()).toLogical(scale);
+  const screenMax = Math.max(240, window.screen.availHeight - 40);
+  const height = Math.min(size.height + extra, screenMax);
+  if (height > size.height) await win.setSize(new LogicalSize(size.width, height));
 }
 export async function startStickyResize(direction: 'East' | 'South' | 'SouthEast') {
   if (isTauriRuntime()) await getCurrentWindow().startResizeDragging(direction);

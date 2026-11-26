@@ -344,9 +344,16 @@
   transition: box-shadow 140ms ease;
 }
 .editor:focus-within { box-shadow: 0 0 0 1.5px var(--accent-soft), 0 0 0 0.5px var(--accent); }
+.editor { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--card-line) transparent; }
 .editor textarea {
   flex: 1;
   min-width: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
   resize: none;
   border: 0;
   outline: 0;

@@ -1,5 +1,5 @@
 import { AlertCircle, Check, Pin, PinOff, Plus, StickyNote, Trash2 } from 'lucide-react';
-import type { RefObject } from 'react';
+import { useLayoutEffect, type RefObject } from 'react';
 import { Icon } from '../components/Icon';
 import { formatFullTime, formatNoteTime } from './formatTime';
 import { hasCustomTitle, useNotesStore, type SaveStatus } from './useNotesStore';
@@ -44,6 +44,14 @@ export function CreateNoteTab({ editorRef, now, onNewNote }: Props) {
   const error = useNotesStore((state) => state.error);
   const stored = useNotesStore((state) => state.notes.some((note) => note.id === state.active.id));
   const { edit, setTitle, flush, togglePin, deleteNote, showOnDesktop } = useNotesStore.getState();
+
+  // Fit the textarea to its text; the surrounding card scrolls instead of a nested scrollbox.
+  useLayoutEffect(() => {
+    const area = editorRef.current;
+    if (!area) return;
+    area.style.height = 'auto';
+    area.style.height = `${Math.max(area.scrollHeight, area.parentElement?.clientHeight ?? 0)}px`;
+  }, [active.content, active.id, editorRef]);
 
   const hasContent = active.content.trim() !== '';
   const savedAt = hasContent && stored ? active.updatedAt : null;

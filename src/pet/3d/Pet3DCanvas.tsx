@@ -114,7 +114,8 @@ export default function Pet3DCanvas({ state, blinking, reducedMotion, preview, o
       frameloop="demand"
       dpr={dpr}
       flat={false}
-      gl={{ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true }}
+      // preserveDrawingBuffer is dev-only so the gallery can export the transparent canvas as a PNG.
+      gl={{ alpha: true, antialias: true, powerPreference: 'low-power', premultipliedAlpha: true, preserveDrawingBuffer: import.meta.env.DEV }}
       // A tight near/far range around the cat (~5–7.5 units away) keeps depth precision high
       // enough for layered details like iris-on-eyeball, even with 16-bit depth buffers.
       camera={{ fov: CAMERA.fov, position: view.position, near: 2, far: 12 }}

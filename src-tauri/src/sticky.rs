@@ -131,9 +131,30 @@ pub fn lower_to_desktop<R: Runtime>(_window: &tauri::WebviewWindow<R>) {}
 
 /// Lowers a sticky unless the user chose to float it above other windows.
 pub fn settle_on_desktop<R: Runtime>(window: &tauri::WebviewWindow<R>) {
-    if !window.is_always_on_top().unwrap_or(false) {
-        lower_to_desktop(window);
+    if window.is_always_on_top().unwrap_or(false) {
+        return;
     }
+    lower_to_desktop(window);
+    // Inserting just above the desktop puts a window below its siblings, so re-seat the other
+    // stickies underneath: the most recently used sticky stays in front of the rest.
+    for (label, other) in window.app_handle().webview_windows() {
+        if label.starts_with(LABEL_PREFIX) && label != window.label() && !other.is_always_on_top().unwrap_or(false) {
+            lower_to_desktop(&other);
+        }
+    }
+}
+
+/// Raises a sticky above every other window and focuses it. Toggling topmost forces the raise
+/// even when Windows would refuse a plain focus request; the user's own on-top choice is restored.
+fn bring_to_front<R: Runtime>(window: &tauri::WebviewWindow<R>) {
+    let keep = window.is_always_on_top().unwrap_or(false);
+    let _ = window.show();
+    let _ = window.unminimize();
+    let _ = window.set_always_on_top(true);
+    if !keep {
+        let _ = window.set_always_on_top(false);
+    }
+    let _ = window.set_focus();
 }
 
 fn valid_id(id: &str) -> bool {
@@ -151,10 +172,11 @@ pub async fn open_sticky<R: Runtime>(app: &AppHandle<R>, db: &StickyDb, id: &str
     }
     let label = label_for(id);
     if let Some(window) = app.get_webview_window(&label) {
-        let _ = window.show();
-        let _ = window.unminimize();
         if focus {
-            let _ = window.set_focus();
+            bring_to_front(&window);
+        } else {
+            let _ = window.show();
+            let _ = window.unminimize();
         }
         return Ok(());
     }
@@ -212,7 +234,7 @@ pub async fn open_sticky<R: Runtime>(app: &AppHandle<R>, db: &StickyDb, id: &str
     window.show().map_err(|e| e.to_string())?;
     if focus {
         // Being opened to type: stay in front while focused; it drops to the desktop on blur.
-        let _ = window.set_focus();
+        bring_to_front(&window);
     } else {
         settle_on_desktop(&window);
     }

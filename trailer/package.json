@@ -1,0 +1,20 @@
+{
+  "name": "nottli-trailer",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Trailer out/nottli-trailer.mp4",
+    "still": "remotion still src/index.ts Trailer out/frame.png"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.546",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.546"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "typescript": "^7.0.2"
+  }
+}

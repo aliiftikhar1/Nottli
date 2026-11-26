@@ -21,7 +21,9 @@
 .sticky-body-view, .sticky-body-editor { margin-top: 10px; width: 100%; box-sizing: border-box; color: var(--ink); font: inherit; font-size: 14px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
 .sticky-body-view { min-height: 120px; user-select: text; cursor: text; }
 .sticky-body-view:empty, .sticky-body-view { color: var(--ink); }
-.sticky-body-editor { min-height: 140px; resize: none; border: 0; outline: 0; padding: 4px 0; background: transparent; scrollbar-width: thin; scrollbar-color: var(--edge) transparent; }
+.sticky-body-editor { display: block; min-height: 120px; resize: none; overflow: hidden; border: 0; outline: 0; padding: 0; background: transparent; word-break: break-word; }
+.sticky-body-view { word-break: break-word; }
+.sticky-body-view.has-list, .sticky-body-editor.has-list { min-height: 24px; }
 .sticky-body-editor::placeholder, .sticky-list-input::placeholder { color: var(--ink-soft); }
 .sticky-foot { position: absolute; z-index: 4; left: 8px; right: 8px; bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 34px; padding: 0 4px; opacity: 0; pointer-events: none; transition: opacity 140ms ease; }
 .sticky:hover .sticky-foot, .sticky:focus-within .sticky-foot, .sticky-foot:hover { opacity: 1; pointer-events: auto; }

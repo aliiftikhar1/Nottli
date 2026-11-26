@@ -1,7 +1,7 @@
 import { AlertCircle, Check, EyeOff, Layers, ListChecks, Palette, Pin, PinOff, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
-import { startStickyDrag, startStickyResize, stickyClose, stickyNoteId } from '../native/desktop';
+import { growStickyBy, startStickyDrag, startStickyResize, stickyClose, stickyNoteId } from '../native/desktop';
 import { STICKY_THEMES, type StickyListItem, type StickyTheme } from '../notes/notesRepository';
 import { createStickyNote } from './stickyActions';
 import { useSticky } from './useSticky';
@@ -30,7 +30,24 @@ function Sticky({ id }: { id: string }) {
     if (!note || focused.current) return;
     focused.current = true;
     if (!note.content && note.listItems === null) setEditing('body');
+    if (!note.content && note.listItems !== null && note.listItems.length === 0) setEditing(null);
   }, [note]);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const content = note?.content;
+  const listItems = note?.listItems;
+  const hasList = listItems !== null && listItems !== undefined;
+  useEffect(() => {
+    // Fit the textarea to its text, then grow the window if the content no longer fits.
+    const area = bodyRef.current;
+    const box = contentRef.current;
+    if (!box) return;
+    if (area && editing === 'body') {
+      area.style.height = 'auto';
+      area.style.height = `${area.scrollHeight}px`;
+    }
+    const overflow = box.scrollHeight - box.clientHeight;
+    if (overflow > 0) void growStickyBy(overflow).catch(() => undefined);
+  }, [content, listItems, editing]);
   useEffect(() => { if (editing === 'title') titleRef.current?.focus(); if (editing === 'body') bodyRef.current?.focus(); }, [editing]);
   useEffect(() => {
     if (!confirmDelete) return;
@@ -80,18 +97,19 @@ function Sticky({ id }: { id: string }) {
   return (
     <div ref={stickyRef} className={`sticky${drag.current?.started ? ' is-dragging' : ''}`} data-theme={note.stickyTheme} role="group" aria-label="Sticky note"
       onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
-      <div className="sticky-content">
+      <div ref={contentRef} className="sticky-content">
         {editing === 'title' ? (
           <input ref={titleRef} className="sticky-title-editor" value={note.title} onChange={(event) => rename(event.target.value)} onBlur={() => setEditing(null)}
             onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); setEditing(null); } }} maxLength={120} aria-label="Sticky title" spellCheck />
         ) : (
           <div className="sticky-title-view" onMouseDown={(event) => editOnSecondClick('title', event)} onDoubleClick={(event) => { event.preventDefault(); doubleClick('title'); }} title="Double-click to edit title">{note.title || 'Title'}</div>
         )}
-        {note.listItems !== null ? <Checklist items={note.listItems} onChange={editList} /> : editing === 'body' ? (
-          <textarea ref={bodyRef} className="sticky-body-editor" value={note.content} onChange={(event) => editBody(event.target.value)} onBlur={() => setEditing(null)} placeholder="Write something…" aria-label="Sticky note text" spellCheck />
-        ) : (
-          <div className="sticky-body-view" onMouseDown={(event) => editOnSecondClick('body', event)} onDoubleClick={(event) => { event.preventDefault(); doubleClick('body'); }} title="Double-click to edit note">{note.content || 'Double-click to add a thought…'}</div>
-        )}
+        {editing === 'body' ? (
+          <textarea ref={bodyRef} className={`sticky-body-editor${hasList ? ' has-list' : ''}`} value={note.content} onChange={(event) => editBody(event.target.value)} onBlur={() => setEditing(null)} placeholder="Write something…" aria-label="Sticky note text" spellCheck />
+        ) : (note.content || !hasList) ? (
+          <div className={`sticky-body-view${hasList ? ' has-list' : ''}`} onMouseDown={(event) => editOnSecondClick('body', event)} onDoubleClick={(event) => { event.preventDefault(); doubleClick('body'); }} title="Double-click to edit note">{note.content || 'Double-click to add a thought…'}</div>
+        ) : null}
+        {note.listItems !== null ? <Checklist items={note.listItems} onChange={editList} /> : null}
       </div>
 
       <footer className="sticky-foot">

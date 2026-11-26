@@ -14,6 +14,12 @@ import { notesRepository as repository, type Note, type StickyListItem, type Sti
 
 export type StickySave = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
+/** Older list notes mirrored their items into `content`; show that text only once, as the list. */
+function normalizeLegacyList<T extends Note>(row: T): T {
+  if (row.listItems && row.content === row.listItems.map((item) => item.text).join('\n')) return { ...row, content: '' };
+  return row;
+}
+
 const SAVE_DELAY_MS = 500;
 const GEOMETRY_DELAY_MS = 500;
 
@@ -82,7 +88,6 @@ export function useSticky(id: string) {
       commit({
         ...current,
         content,
-        listItems: null,
         updatedAt: new Date().toISOString()
       });
       schedule();
@@ -93,21 +98,20 @@ export function useSticky(id: string) {
   const editList = useCallback((items: StickyListItem[]) => {
     const current = noteRef.current;
     if (!current) return;
-    const content = items.map((item) => item.text).join('\n');
-    commit({ ...current, listItems: items, content, updatedAt: new Date().toISOString() });
+    commit({ ...current, listItems: items, updatedAt: new Date().toISOString() });
     schedule();
   }, [commit, schedule]);
 
   const toggleList = useCallback(() => {
     const current = noteRef.current;
     if (!current) return;
+    // The paragraph text stays; the checklist is added below it or folded back into the text.
     if (current.listItems !== null) {
-      const content = current.listItems.map((item) => item.text).join('\n');
+      const lines = current.listItems.map((item) => item.text).filter((text) => text.trim() !== '').join('\n');
+      const content = [current.content.trimEnd(), lines].filter(Boolean).join('\n');
       commit({ ...current, listItems: null, content, updatedAt: new Date().toISOString() });
     } else {
-      const text = current.content.trim();
-      const listItems = text ? [{ id: crypto.randomUUID(), text: current.content, done: false }] : [];
-      commit({ ...current, listItems, updatedAt: new Date().toISOString() });
+      commit({ ...current, listItems: [{ id: crypto.randomUUID(), text: '', done: false }], updatedAt: new Date().toISOString() });
     }
     schedule();
   }, [commit, schedule]);
@@ -124,7 +128,8 @@ export function useSticky(id: string) {
   );
 
   const reload = useCallback(async () => {
-    const row = await repository.get(id);
+    const loaded = await repository.get(id);
+    const row = loaded ? normalizeLegacyList(loaded) : loaded;
     if (!row) {
       setGone(true);
       return;
