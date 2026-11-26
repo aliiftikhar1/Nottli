@@ -45,7 +45,9 @@ Product: Nottli, Store ID 9N6WF6BWCWL6, submission 1 (draft). Identity: `AliIfti
 - [x] Store listings: description, release notes, short description, 5 keywords, copyright, developer name entered and saved
 - [x] Store listings: 6 screenshots uploaded and captioned (Complete). ALL six sections now Complete
 - [x] Submitted for certification on 2026-11-25 (status: In certification; usually hours, up to ~3 business days). Store ID 9N6WF6BWCWL6, link will be https://apps.microsoft.com/detail/9N6WF6BWCWL6
-- [ ] After it passes: send the Store link, update trailer end card ("Coming soon" -> live), upload trailer + thumbnail, add Store link to README
+- [x] LIVE (confirmed 2026-11-26): https://apps.microsoft.com/detail/9N6WF6BWCWL6 (3+ rating, free, Productivity). README Install section now links it
+- [x] Trailer end card changed to "Free on the Microsoft Store"
+- [ ] Upload trailer (`trailer/out/nottli-trailer.mp4`) + thumbnail (`trailer/out/nottli-thumbnail.png`) in a new submission (the first upload attempt failed)
 - [ ] If it fails: read the certification report email/page, fix, rebuild with `pnpm build:msix -IdentityName "AliIftikhar.Nottli" -Publisher "CN=53EF73C7-E7A9-4E9D-A3EC-E73EEB2D8876" -PublisherDisplayName "Ali Iftikhar"` (bump version, last part must stay 0), resubmit
 
 Original checklist:

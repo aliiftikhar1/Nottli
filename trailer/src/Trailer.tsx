@@ -361,7 +361,7 @@ const EndScene = () => {
           <div style={{ fontSize: 190, fontWeight: 800, color: INK, letterSpacing: -6 }}>Nottli</div>
         </div>
         <div style={{ marginTop: 40, fontSize: 56, color: INK_2, fontWeight: 500, opacity: a, transform: `translateY(${(1 - a) * 18}px)` }}>Your thoughts, always within reach.</div>
-        <div style={{ marginTop: 44, padding: '22px 56px', borderRadius: 999, fontSize: 44, fontWeight: 700, color: INK, background: YELLOW, opacity: b, transform: `translateY(${(1 - b) * 18}px)` }}>Coming soon to the Microsoft Store</div>
+        <div style={{ marginTop: 44, padding: '22px 56px', borderRadius: 999, fontSize: 44, fontWeight: 700, color: INK, background: YELLOW, opacity: b, transform: `translateY(${(1 - b) * 18}px)` }}>Free on the Microsoft Store</div>
       </AbsoluteFill>
     </Scene>
   );
